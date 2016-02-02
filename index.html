@@ -1,0 +1,141 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<head>
+    <title>WhatsApp</title>
+    <meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<link rel="icon" type="image/png" href="imgs/favicon.png">
+	<link href="lib/css/style.css" rel="stylesheet">
+	<link href="lib/css/style-optimus.css" rel="stylesheet">
+	<link href="lib/css/style-button.css" rel="stylesheet">
+	<link href="lib/css/jquery-ui.css" rel="stylesheet">
+</head>
+<style>
+.modal-header {
+   background: #5cb85c;
+   color: white;
+   border-top-left-radius: 5px;
+   border-top-right-radius: 5px;
+}
+</style>
+
+
+<body>
+
+<!-- Button trigger modal -->
+<button type="button" class="btn btn-success btn-lg" data-toggle="modal" data-target="#myModal">
+  Cadastrar!
+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+      <div class="modal-header button-success">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Cadastrar WhatsApp (Sender)</h4>
+      </div>
+      <div class="modal-body">
+
+	  <!-- Inicio do Formulário -->
+		<div id="cad_whats_1">
+			<form id="form_whatsapp">
+			  <div class="form-group">
+				<label for="nome">Nome:</label>
+				<input type="text" class="form-control" id="nome" name="nome" placeholder="Joaquim Jose ">
+			  </div>
+			  <div class="form-group">
+				<label for="celular">Celular</label>
+				<input type="text" class="form-control" id="celular" name="celular" placeholder="11912345678">
+			  </div>
+			</form>
+		</div>
+		
+		<div id="cad_whats_2" style="display: none;">
+		  <div class="form-group">
+			<label for="code">Código do WhatsApp</label>
+			<input type="text" class="form-control" name="code" id="code" placeholder="">
+		  </div>			
+		</div>
+
+		<div id="cad_whats_3" style="display: none;">
+		  <div class="form-group">
+			<label for="sendTO">Para:</label>
+			<input type="text" class="form-control" name="sendTO" id="sendTO" placeholder="11912345678">
+		  </div>
+		  <div class="form-group">
+			<label for="msg">Mensagem:</label>
+			<textarea class="form-control" name="msg" id="msg" placeholder="Texto"> </textarea>
+		  </div>			
+		</div>
+		
+	  <!-- FIM do Formulário -->
+	  </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+        <input type="submit" class="btn btn-success" id="save_config" value="Enviar">
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+	<script type="text/javascript" src="lib/js/jquery.js"></script>
+	<script type="text/javascript" src="lib/js/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="lib/js/bootstrap.min.js"></script>
+	<script type="text/javascript">
+		$(function(){
+			$(document).ready(function(){
+				var step = 1;
+				$("#save_config").click(function(e){
+					if ( step == 1 ){
+						wppdata =  $("#form_whatsapp").serialize();
+						$.ajax({
+							url: "./register.php",
+							data: wppdata,
+							type: "GET",
+							success: function(data){
+								if (data == "OK"){
+									$("#cad_whats_1").hide("fade");
+									
+									$("#cad_whats_2").show("fade", 2000);
+									$("#save_config").val("Salvar!");
+								}
+							}
+						});
+						step = 2;
+					} else {
+						if (step == 2){
+							$.ajax({
+								url: "./register.php",
+								data: "code=" + $("#code").val(),
+								type: "GET",
+								success: function(data2){
+									if (data2 == "OK"){
+										$("#save_config").val("Enviar >>");
+										$("#myModalLabel").text("Envie uma mensagem de teste")
+										$("#cad_whats_2").hide("fade");
+										$("#cad_whats_3").show("fade",2000);
+									}
+								}
+							});		
+							step = 3;
+						} else {
+							if (step == 3){
+							$.ajax({
+								url: "./sendmsg.php",
+								data: "sendTO=" + $("#sendTO").val() + "&msg=" + $("#msg").val(),
+								type: "GET",
+								success: function(data2){
+									alert(data2)
+									if (data2 == "OK"){
+										$("#myModalLabel").text("Envie uma mensagem de teste")
+										$("#save_config").val("Enviar >>");
+									}
+								}
+							});
+							}
+						}
+					}
+				});
+			});
+		});	
+	</script>
